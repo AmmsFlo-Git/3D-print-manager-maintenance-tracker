@@ -1,73 +1,108 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>P1S — Suivi d'entretien Bambu Lab</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🖨️</text></svg>">
+<title>P1S Tracker — Suivi d'entretien Bambu Lab P1S</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐯</text></svg>">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<header class="topbar">
-  <div class="brand">
-    <span class="brand-icon">🖨️</span>
-    <div>
-      <h1>Suivi d'entretien — Bambu Lab P1S</h1>
-      <p class="subtitle">Suivi basé sur le total d'heures d'impression de l'imprimante</p>
-    </div>
-  </div>
-  <div class="hours-panel">
-    <label for="totalHours">Heures totales d'impression</label>
-    <div class="hours-controls">
-      <button class="step-btn" data-step="-50" title="-50 h">−50</button>
-      <button class="step-btn" data-step="-10" title="-10 h">−10</button>
-      <button class="step-btn" data-step="-1" title="-1 h">−1</button>
-      <input type="number" id="totalHours" min="0" step="1" inputmode="numeric">
-      <button class="step-btn" data-step="1" title="+1 h">+1</button>
-      <button class="step-btn" data-step="10" title="+10 h">+10</button>
-      <button class="step-btn" data-step="50" title="+50 h">+50</button>
-    </div>
-    <div class="avg-row">
-      <label for="avgPerDay">Rythme moyen d'impression</label>
-      <div class="avg-controls">
-        <input type="number" id="avgPerDay" min="0" max="24" step="0.5" inputmode="decimal">
-        <span>h/jour (pour estimer les dates)</span>
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sb-header">
+      <div class="sb-brand">
+        <span class="sb-brand-dot">🐯</span>
+        <span class="sb-brand-name">P1S Tracker</span>
       </div>
     </div>
-  </div>
-</header>
+    <nav class="sb-nav">
+      <button class="sb-nav-item active" data-view="entretien">
+        <span class="sb-nav-icon">🔧</span><span class="label">Entretien</span>
+      </button>
+      <button class="sb-nav-item" data-view="identite">
+        <span class="sb-nav-icon">🖨️</span><span class="label">Ma P1S</span>
+      </button>
+    </nav>
+    <div class="sb-footer">
+      <button id="themeToggle" class="sb-btn" title="Changer de thème">🌙 Thème sombre</button>
+      <button id="exportBtn" class="sb-btn">⬇️ Exporter</button>
+      <button id="importBtn" class="sb-btn">⬆️ Importer</button>
+      <input type="file" id="importFile" accept="application/json,.json" hidden>
+      <button id="resetAllBtn" class="sb-btn danger">🗑️ Tout réinitialiser</button>
+    </div>
+  </aside>
 
-<section class="stats" id="stats"></section>
+  <main class="content">
+    <header class="content-header">
+      <h1 id="pageTitle">Entretien</h1>
+      <p id="pageSubtitle" class="content-subtitle">Suivi de la maintenance de votre Bambu Lab P1S, basé sur le total d'heures d'impression</p>
+    </header>
 
-<section class="toolbar">
-  <input type="search" id="search" placeholder="Rechercher une tâche…" aria-label="Rechercher une tâche">
-  <div class="chips" id="filters">
-    <button class="chip active" data-filter="all">Toutes</button>
-    <button class="chip" data-filter="overdue">En retard</button>
-    <button class="chip" data-filter="soon">Bientôt</button>
-    <button class="chip" data-filter="ok">OK</button>
-  </div>
-  <select id="sort" aria-label="Trier">
-    <option value="due">Prochaine échéance</option>
-    <option value="overdue">En retard d'abord</option>
-    <option value="interval">Intervalle croissant</option>
-    <option value="title">Ordre alphabétique</option>
-  </select>
-  <div class="toolbar-actions">
-    <button id="exportBtn" class="ghost-btn">Exporter</button>
-    <button id="importBtn" class="ghost-btn">Importer</button>
-    <input type="file" id="importFile" accept="application/json,.json" hidden>
-    <button id="resetAllBtn" class="danger-btn">Tout réinitialiser</button>
-  </div>
-</section>
+    <section id="view-entretien" class="view active">
+      <div class="hours-panel card">
+        <div class="hours-main">
+          <label for="totalHours">Heures totales d'impression</label>
+          <div class="hours-controls">
+            <button class="step-btn" data-step="-50">−50</button>
+            <button class="step-btn" data-step="-10">−10</button>
+            <button class="step-btn" data-step="-1">−1</button>
+            <input type="number" id="totalHours" min="0" step="1" inputmode="numeric">
+            <button class="step-btn" data-step="1">+1</button>
+            <button class="step-btn" data-step="10">+10</button>
+            <button class="step-btn" data-step="50">+50</button>
+          </div>
+        </div>
+        <div class="avg-row">
+          <label for="avgPerDay">Rythme moyen</label>
+          <input type="number" id="avgPerDay" min="0" max="24" step="0.5" inputmode="decimal">
+          <span class="avg-unit">h/jour (pour estimer les dates d'échéance)</span>
+        </div>
+      </div>
 
-<main id="taskList" class="task-grid"></main>
+      <section class="stats" id="stats"></section>
 
-<footer class="footer">
-  <p>Intervalles suggérés d'après le <a href="https://wiki.bambulab.com/en/p1/maintenance/p1p-maintenance" target="_blank" rel="noopener">guide de maintenance officiel Bambu Lab série P1</a>,
-  convertis en heures (hypothèse : ~8 h/jour ≈ 1 mois = 240 h, 1 bobine ≈ 50 h d'impression). Chaque intervalle est modifiable directement sur la carte.</p>
-  <p>Données enregistrées localement dans votre navigateur (localStorage). Aucune donnée n'est envoyée sur Internet.</p>
-</footer>
+      <div class="toolbar">
+        <input type="search" id="search" placeholder="Rechercher une tâche…" aria-label="Rechercher une tâche">
+        <div class="chips" id="filters">
+          <button class="chip active" data-filter="all">Toutes</button>
+          <button class="chip" data-filter="overdue">En retard</button>
+          <button class="chip" data-filter="soon">Bientôt</button>
+          <button class="chip" data-filter="ok">OK</button>
+        </div>
+        <select id="sort" aria-label="Trier">
+          <option value="due">Prochaine échéance</option>
+          <option value="overdue">En retard d'abord</option>
+          <option value="interval">Intervalle croissant</option>
+          <option value="title">Ordre alphabétique</option>
+        </select>
+      </div>
+
+      <main id="taskSections"></main>
+    </section>
+
+    <section id="view-identite" class="view">
+      <div class="card identity-card">
+        <div class="identity-head">
+          <div class="identity-avatar">🖨️</div>
+          <div class="identity-head-text">
+            <h2 id="idSurname">Ma P1S</h2>
+            <p id="idModel" class="identity-model">Bambu Lab P1S</p>
+          </div>
+          <button id="editIdentityBtn" class="btn primary">✏️ Modifier</button>
+        </div>
+        <div class="identity-grid" id="identityGrid"></div>
+        <div class="identity-stats" id="identityStats"></div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <p>Intervalles suggérés d'après le <a href="https://wiki.bambulab.com/en/p1/maintenance/p1p-maintenance" target="_blank" rel="noopener">guide de maintenance officiel Bambu Lab série P1</a> et les tutos YouTube liés sur chaque tâche.
+      Conversion en heures : ~8 h/jour ⇒ 1 mois ≈ 240 h, 3 mois ≈ 720 h, 1 bobine ≈ 50 h. Chaque intervalle est modifiable sur la carte.</p>
+      <p>Données enregistrées localement dans votre navigateur (localStorage). Aucune donnée n'est envoyée sur Internet. Design inspiré de Tiger Studio Manager 2.</p>
+    </footer>
+  </main>
+</div>
 
 <script src="app.js" defer></script>
 </body>
