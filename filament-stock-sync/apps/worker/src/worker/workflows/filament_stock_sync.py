@@ -183,6 +183,12 @@ def compute_deductions(
 
 
 def _loads(result: Any) -> Any:
+    """Normalize a connector tool result: MCP-style {content:[{text:...}]}, a JSON
+    string, or an already-decoded object."""
+    if isinstance(result, dict):
+        content = result.get("content")
+        if isinstance(content, list) and content and isinstance(content[0], dict) and "text" in content[0]:
+            result = content[0]["text"]
     if isinstance(result, str):
         return json.loads(result)
     return result
@@ -284,7 +290,7 @@ async def fetch_done_prints(
 async def fetch_spools(
     client: ToolCallClient = Depends(tigertag),  # noqa: B008 - SDK DI pattern
 ) -> list[dict[str, Any]]:
-    result = await client.call_tool("tigersystem_7e7f_search_inventory", {})
+    result = await client.call_tool("search_inventory", {"limit": 200})
     payload = _loads(result)
     spools = payload.get("spools", []) if isinstance(payload, dict) else payload
     return [
@@ -309,7 +315,7 @@ async def apply_consumption(
     if dry_run:
         return {"spool_id": spool_id, "grams": grams, "applied": False}
     await client.call_tool(
-        "tigersystem_7e7f_set_spool_weight",
+        "set_spool_weight",
         {"spool_id": spool_id, "grams": grams, "mode": "consumed"},
     )
     return {"spool_id": spool_id, "grams": grams, "applied": True}
