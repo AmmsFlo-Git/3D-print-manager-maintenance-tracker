@@ -1,2 +1,2 @@
-# p1s-maintenance-tracker
+# 3D-print-maintenance-tracker
 Application de suivi et de gestion de la maintenance du parc d'imprimante
