@@ -56,8 +56,8 @@ _COLOR_KEYWORDS = {
     "gray": ("grey", "gray", "slate"),
     "red": ("red", "fire", "jasper", "cherry"),
     "wood": ("wood", "oak"),
-    "yellow": ("yellow", "gold", "sunny"),
-    "jaune": ("yellow", "jaune", "gold", "orange", "sunny"),
+    "yellow": ("yellow", "sunny"),
+    "jaune": ("yellow", "jaune", "orange", "sunny"),
     "brown": ("brown", "coffee", "chocolate"),
     "blue": ("blue", "lagoon", "klein", "navy", "azure", "cyan", "turquoise", "indigo"),
     "orange": ("orange", "juicy"),
@@ -102,7 +102,7 @@ def spool_candidates(label: str, spools: list[dict[str, Any]]) -> list[dict[str,
             continue
         name = str(spool.get("name", "")).lower()
         colour_hit = any(k in name for k in keywords)
-        groups[rank * 2 + (0 if colour_hit else 1)].append(spool)
+        groups[(0 if colour_hit else 2) + rank].append(spool)
     ordered: list[dict[str, Any]] = []
     for group in groups:
         ordered.extend(

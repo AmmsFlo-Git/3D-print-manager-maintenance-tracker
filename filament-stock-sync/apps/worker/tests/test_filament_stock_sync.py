@@ -161,7 +161,7 @@ def test_parse_label() -> None:
     )
     assert parse_label("PETG jaune") == (
         "PETG",
-        ("yellow", "jaune", "gold", "orange", "sunny"),
+        ("yellow", "jaune", "orange", "sunny"),
     )
     assert parse_label("PLAN Orange") == ("PLA", ("orange", "juicy"))
     assert parse_label("OTHER") == (None, ())
@@ -178,6 +178,10 @@ def test_spool_candidates_prefers_exact_material_and_emptiest() -> None:
     # PETG White -> Winter White (exact material), PLA whites must not appear first
     cands = spool_candidates("PETG White", SPOOLS)
     assert cands[0]["id"] == "s-winter"
+    # PLA Brown: no exact-PLA colour hit -> material family + colour (Coffee Brown PLA+),
+    # before any "exact material, any colour" fallback
+    cands = spool_candidates("PLA Brown", SPOOLS)
+    assert cands[0]["id"] == "s-coffee"
     # unmapped labels
     assert spool_candidates("OTHER", SPOOLS) == []
     assert spool_candidates("PLA Skin", SPOOLS) == []
